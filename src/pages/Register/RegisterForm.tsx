@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import type { User } from "../../types/User";
 
 type RegistrationInputs = User & {
-  confirmPassword: string;
+  _confirmPassword: string;
 };
 
 export default function RegisterForm(): JSX.Element {
@@ -44,7 +44,7 @@ export default function RegisterForm(): JSX.Element {
       dob: "",
       username: "",
       password: "",
-      confirmPassword: "",
+      _confirmPassword: "",
     },
     mode: "onChange",
   });
@@ -71,7 +71,7 @@ export default function RegisterForm(): JSX.Element {
   };
 
   const onSubmit = async (data: RegistrationInputs) => {
-    const { confirmPassword, ...userData } = data; // strip confirmPassword
+    const { _confirmPassword, ...userData } = data; // strip confirmPassword
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/users`,
@@ -157,7 +157,7 @@ export default function RegisterForm(): JSX.Element {
                 )}
               />
               <Controller
-                name="confirmPassword"
+                name="_confirmPassword"
                 control={control}
                 rules={{
                   required: "Confirm password is required",
@@ -171,8 +171,8 @@ export default function RegisterForm(): JSX.Element {
                     type="password"
                     fullWidth
                     margin="normal"
-                    error={!!errors.confirmPassword}
-                    helperText={errors.confirmPassword?.message}
+                    error={!!errors._confirmPassword}
+                    helperText={errors._confirmPassword?.message}
                   />
                 )}
               />
@@ -184,7 +184,7 @@ export default function RegisterForm(): JSX.Element {
                   disabled={
                     !!errors.username ||
                     !!errors.password ||
-                    !!errors.confirmPassword
+                    !!errors._confirmPassword
                   }
                 >
                   Next →

@@ -21,7 +21,10 @@ export default function AdvancedSearchFruit() {
         const response = await fruitApi.getAll();
         setAllFruits(response.data);
       } catch (err) {
-        setError("Failed to fetch fruits");
+        console.error("Failed to fetch fruits:", err);
+        setError(
+          `Failed to fetch fruits: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       } finally {
         setLoading(false);
       }
@@ -68,6 +71,11 @@ export default function AdvancedSearchFruit() {
         🔍 Advanced Fruit Search - By Category & Price
       </Typography>
 
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
       <Paper
         sx={{
           backgroundColor: "#f9f9f9",

@@ -70,7 +70,9 @@ export default function App(): JSX.Element {
         const response = await fruitApi.getAll();
         setFruits(response.data);
       } catch (err) {
-        setError("Failed to fetch fruits");
+        setError(
+          `Failed to fetch fruits: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       } finally {
         setLoading(false);
       }
@@ -177,7 +179,10 @@ export default function App(): JSX.Element {
         type: "success",
         msg: "Fruit added successfully!",
       });
-    } catch (error) {
+    } catch (err) {
+      setError(
+          `Failed to add fruit: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       setSnackbar({
         open: true,
         type: "error",
@@ -197,7 +202,10 @@ export default function App(): JSX.Element {
         type: "success",
         msg: "Fruit updated successfully!",
       });
-    } catch (error) {
+    } catch (err) {
+      setError(
+          `Failed to update fruit: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       setSnackbar({
         open: true,
         type: "error",
@@ -215,7 +223,10 @@ export default function App(): JSX.Element {
         type: "success",
         msg: "Fruit deleted successfully!",
       });
-    } catch (error) {
+    } catch (err) {
+      setError(
+          `Failed to delete fruit: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       setSnackbar({
         open: true,
         type: "error",

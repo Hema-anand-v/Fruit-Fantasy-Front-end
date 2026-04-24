@@ -56,7 +56,9 @@ export default function FruitDetail({
         const response = await fruitApi.getById(Number(id));
         setFruit(response.data);
       } catch (err) {
-        setError("Failed to fetch fruit");
+        setError(
+          `Failed to fetch fruit: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
       } finally {
         setLoading(false);
       }
