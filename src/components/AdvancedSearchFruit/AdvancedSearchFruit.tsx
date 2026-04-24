@@ -1,10 +1,8 @@
-import { useState, type ChangeEvent } from "react";
-import useFetch from "../../hooks/useFetch";
+import { useMemo, useEffect, useState, type ChangeEvent } from "react";
+import { fruitApi } from "../../api/fruitapi";
 import type { Fruit } from "../../types/Fruit";
-import ErrorMessage from "../ErrorMessage";
-import FruitManager from "../../pages/FruitManager/FruitManager";
-
 import { Box, Typography, TextField, Button, Grid, Paper } from "@mui/material";
+import FruitList from "../FruitList/FruitList";
 
 export default function AdvancedSearchFruit() {
   const [category, setCategory] = useState("");
@@ -12,31 +10,41 @@ export default function AdvancedSearchFruit() {
   const [shouldSearch, setShouldSearch] = useState(false);
   const [searchCount, setSearchCount] = useState(0);
 
-  const buildSearchUrl = (): string => {
-    if (!shouldSearch) return "";
+  // Replace the buildSearchUrl and useFetch logic with:
+  const [allFruits, setAllFruits] = useState<Fruit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const url = "http://localhost:3000/fruits?";
-    const params: string[] = [];
+  useEffect(() => {
+    const fetchFruits = async () => {
+      try {
+        const response = await fruitApi.getAll();
+        setAllFruits(response.data);
+      } catch (err) {
+        setError("Failed to fetch fruits");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFruits();
+  }, []);
 
-    if (category.trim()) {
-      params.push(`category=${encodeURIComponent(category)}`);
-    }
+  const filteredResults = useMemo(() => {
+    if (!shouldSearch || !allFruits) return [];
 
-    if (minPrice && !isNaN(Number(minPrice))) {
-      params.push(`price_gte=${minPrice}`);
-    }
-
-    return url + params.join("&");
-  };
-
-  const searchUrl = buildSearchUrl();
-  const { data: fetchedResults, loading, error } = useFetch<Fruit[]>(searchUrl);
+    return allFruits.filter((fruit) => {
+      const matchesCategory =
+        !category.trim() ||
+        fruit.name.toLowerCase().includes(category.toLowerCase());
+      const matchesPrice = !minPrice || Number(fruit.price) >= Number(minPrice);
+      return matchesCategory && matchesPrice;
+    });
+  }, [allFruits, category, minPrice, shouldSearch]);
 
   const handleSearch = () => {
     if (category.trim() || minPrice) {
       setShouldSearch(true);
       setSearchCount((prev) => prev + 1);
-      console.log(`Search triggered! URL will be: ${buildSearchUrl()}`);
     }
   };
 
@@ -119,26 +127,21 @@ export default function AdvancedSearchFruit() {
             Searches performed: {searchCount}
           </Typography>
         </Box>
-
-        {shouldSearch && (
-          <Box sx={{ fontSize: "0.85rem", color: "#e65100" }}>
-            <strong>Current Search URL: </strong>
-            <code>{searchUrl || "No active search"}</code>
+        {shouldSearch && filteredResults && !loading && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Search Results ({filteredResults.length} found)
+            </Typography>
+            <FruitList
+              fruits={filteredResults}
+              onDeleteFruit={() => {}} // No-op for search results
+              onAddToCart={() => {}} // No-op for search results
+              onToggleWishlist={() => {}} // No-op for search results
+              onClearWishlist={() => {}} // No-op for search results
+            />
           </Box>
         )}
       </Paper>
-
-      {error && <ErrorMessage message={`Search failed: ${error}`} />}
-
-      {shouldSearch && fetchedResults && !loading && (
-        <Box>
-          {Array.isArray(fetchedResults) ? (
-            <FruitManager fruits={fetchedResults} />
-          ) : (
-            <ErrorMessage message="We couldn’t load the search results. Please try again." />
-          )}
-        </Box>
-      )}
     </Box>
   );
 }

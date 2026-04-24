@@ -24,8 +24,7 @@ import type { SelectChangeEvent } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { fruitApi } from "../../api/fruitapi";
 import type { Fruit } from "../../types/Fruit";
-import { useContext } from "react";
-import AuthContext from "../../context/AuthContext";
+
 
 // Define props type
 type FruitDetailProps = {
@@ -39,7 +38,6 @@ export default function FruitDetail({
 }: FruitDetailProps): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { role } = useContext(AuthContext)!;
   const image = useRef<string>("");
   const [formData, setFormData] = useState({
     name: "",
